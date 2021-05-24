@@ -9,6 +9,8 @@ CC=gcc
 all: 
 	@$(CC) readCAN.c -o readCAN
 	@$(CC) sendCAN.c -o sendCAN
+install:
+
 clean:
 	-@rm -f readCAN \
 	sendCAN
