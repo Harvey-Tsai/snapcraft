@@ -18,6 +18,8 @@ else
 	PWD  := $(shell pwd)
 all:	
 	$(MAKE) -w -C $(KDIR) SUBDIRS=$(PWD) modules 
+	gcc readCAN.c -o readCAN
+	gcc sendCAN.c -o sendCAN
 endif
 
 
@@ -50,6 +52,9 @@ clean:
 	-@rm -rf .tmp_versions
 	-@rm -rf *~
 	-@rm -rf *odule*
+	-@rm -f readCAN
+	-@rm -f sendCAN
 	
+
 
 
