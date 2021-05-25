@@ -39,8 +39,8 @@ MODULE_AUTHOR(" Carl ");
 MODULE_DESCRIPTION("SocketCAN driver for Advantech CAN cards");
 MODULE_SUPPORTED_DEVICE("Advntech CAN cards");
 MODULE_LICENSE("GPL");
-static char *serial_version = "1.0.1.0";
-static char *serial_revdate = "2018/10/25";
+static char *serial_version = "1.0.1.2";
+static char *serial_revdate = "2019/05/21";
 
 #define Max_CAN_Port 4	//Max can port 
 #define CAN_Clock (16000000 / 2) //16000000 : crystal frequency
@@ -210,6 +210,10 @@ static int advcan_pci_init_one(struct pci_dev *pdev,const struct pci_device_id *
 	devExt->portNum		= portNum;
 	devExt->portsernum  = portsernum;
 
+#ifdef CONFIG_PCI_MSI
+	pci_enable_msi(pdev);
+#endif
+
 
 	for (int i = 0; i < devExt->portNum; i++) 
 	{
@@ -219,7 +223,7 @@ static int advcan_pci_init_one(struct pci_dev *pdev,const struct pci_device_id *
         	devExt->addlen[i] = len;
 	
 
-		dev = alloc_sja1000dev(sizeof(struct advcan_pci_card));
+		dev = adv_alloc_sja1000dev(sizeof(struct advcan_pci_card));
 		if (dev == NULL) 
 		{
 			goto error_out;
@@ -288,18 +292,18 @@ static int advcan_pci_init_one(struct pci_dev *pdev,const struct pci_device_id *
 			SET_NETDEV_DEV(dev, &pdev->dev);
 
 			/* Register SJA1000 device */
-			err = register_sja1000dev(dev);
+			err = adv_register_sja1000dev(dev);
 			if (err) 
 			{
 				dev_err(&pdev->dev, "Registering device failed (err=%d)\n", err);
-				free_sja1000dev(dev);
+				adv_free_sja1000dev(dev);
 				goto error_out;
 			}
 
 		} 
 		else 
 		{
-			free_sja1000dev(dev);
+			adv_free_sja1000dev(dev);
 		}
 		portsernum++;
 	}
@@ -331,8 +335,12 @@ static void advcan_pci_remove_one(struct pci_dev *pdev)
 		
 		dev_info(&pdev->dev, "Removing %s.\n", dev->name);
 
-		unregister_sja1000dev(dev);
-		free_sja1000dev(dev);
+		adv_unregister_sja1000dev(dev);
+		adv_free_sja1000dev(dev);
+#ifdef	CONFIG_PCI_MSI
+		pci_disable_msi(pdev);
+#endif
+		
 
 		if ( pdev->device == 0xc201
 	      	|| pdev->device == 0xc202

@@ -174,11 +174,11 @@ struct sja1000_priv {
 	u8 cdr;			/* clock divider register */
 };
 
-struct net_device *alloc_sja1000dev(int sizeof_priv);
-void free_sja1000dev(struct net_device *dev);
-int register_sja1000dev(struct net_device *dev);
-void unregister_sja1000dev(struct net_device *dev);
+struct net_device *adv_alloc_sja1000dev(int sizeof_priv);
+void adv_free_sja1000dev(struct net_device *dev);
+int adv_register_sja1000dev(struct net_device *dev);
+void adv_unregister_sja1000dev(struct net_device *dev);
 
-irqreturn_t sja1000_interrupt(int irq, void *dev_id);
+irqreturn_t adv_sja1000_interrupt(int irq, void *dev_id);
 
 #endif /* SJA1000_DEV_H */

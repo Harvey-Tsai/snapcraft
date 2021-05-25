@@ -14,10 +14,10 @@ obj-m := advsocketcan.o advcan_sja1000.o
 
 
 else
-	KDIR := /lib/modules/4.15.0-041500-generic/build/
+	KDIR := /lib/modules/$(UNAME)/build/
 	PWD  := $(shell pwd)
 all:	
-	$(MAKE) -w -C $(KDIR) SUBDIRS=$(PWD) modules 
+	$(MAKE) -w -C $(KDIR) M=$(PWD) modules
 	gcc readCAN.c -o readCAN
 	gcc sendCAN.c -o sendCAN
 endif
@@ -55,6 +55,5 @@ clean:
 	-@rm -f readCAN
 	-@rm -f sendCAN
 	
-
 
 

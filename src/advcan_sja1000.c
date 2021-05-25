@@ -335,7 +335,7 @@ static void sja1000_rx(struct net_device *dev)
 	uint8_t dreg;
 	canid_t id;
 	int i;
-	
+	printk("interrupt rx\n");
 	/* create zero'ed CAN frame buffer */
 	skb = alloc_can_skb(dev, &cf);
 	if (skb == NULL)
@@ -489,7 +489,7 @@ static int sja1000_err(struct net_device *dev, uint8_t isrc, uint8_t status)
 	return 0;
 }
 
-irqreturn_t sja1000_interrupt(int irq, void *dev_id)
+irqreturn_t adv_sja1000_interrupt(int irq, void *dev_id)
 {
 	struct net_device *dev = (struct net_device *)dev_id;
 	struct sja1000_priv *priv = netdev_priv(dev);
@@ -552,7 +552,7 @@ irqreturn_t sja1000_interrupt(int irq, void *dev_id)
 
 	return (n) ? IRQ_HANDLED : IRQ_NONE;
 }
-EXPORT_SYMBOL_GPL(sja1000_interrupt);
+EXPORT_SYMBOL_GPL(adv_sja1000_interrupt);
 
 static int sja1000_open(struct net_device *dev)
 {
@@ -572,7 +572,7 @@ static int sja1000_open(struct net_device *dev)
 
 	/* register interrupt handler, if not done by the device driver */
 	if (!(priv->flags & SJA1000_CUSTOM_IRQ_HANDLER)) {
-		err = request_irq(dev->irq, sja1000_interrupt, priv->irq_flags,
+		err = request_irq(dev->irq, adv_sja1000_interrupt, priv->irq_flags,
 				  dev->name, (void *)dev);
 		printk("irq= %d \n",dev->irq);
 		if (err) {
@@ -607,7 +607,7 @@ static int sja1000_close(struct net_device *dev)
 	return 0;
 }
 
-struct net_device *alloc_sja1000dev(int sizeof_priv)
+struct net_device *adv_alloc_sja1000dev(int sizeof_priv)
 {
 	struct net_device *dev;
 	struct sja1000_priv *priv;
@@ -635,13 +635,13 @@ struct net_device *alloc_sja1000dev(int sizeof_priv)
 
 	return dev;
 }
-EXPORT_SYMBOL_GPL(alloc_sja1000dev);
+EXPORT_SYMBOL_GPL(adv_alloc_sja1000dev);
 
-void free_sja1000dev(struct net_device *dev)
+void adv_free_sja1000dev(struct net_device *dev)
 {
 	free_candev(dev);
 }
-EXPORT_SYMBOL_GPL(free_sja1000dev);
+EXPORT_SYMBOL_GPL(adv_free_sja1000dev);
 
 static const struct net_device_ops sja1000_netdev_ops = {
        .ndo_open               = sja1000_open,
@@ -649,7 +649,7 @@ static const struct net_device_ops sja1000_netdev_ops = {
        .ndo_start_xmit         = sja1000_start_xmit,
 };
 
-int register_sja1000dev(struct net_device *dev)
+int adv_register_sja1000dev(struct net_device *dev)
 {
 	if (!sja1000_probe_chip(dev))
 		return -ENODEV;
@@ -662,27 +662,27 @@ int register_sja1000dev(struct net_device *dev)
 
 	return register_candev(dev);
 }
-EXPORT_SYMBOL_GPL(register_sja1000dev);
+EXPORT_SYMBOL_GPL(adv_register_sja1000dev);
 
-void unregister_sja1000dev(struct net_device *dev)
+void adv_unregister_sja1000dev(struct net_device *dev)
 {
 	set_reset_mode(dev);
 	unregister_candev(dev);
 }
-EXPORT_SYMBOL_GPL(unregister_sja1000dev);
+EXPORT_SYMBOL_GPL(adv_unregister_sja1000dev);
 
-static __init int sja1000_init(void)
+static __init int adv_sja1000_init(void)
 {
 	printk(KERN_INFO "%s CAN netdevice driver\n", DRV_NAME);
 
 	return 0;
 }
 
-module_init(sja1000_init);
+module_init(adv_sja1000_init);
 
-static __exit void sja1000_exit(void)
+static __exit void adv_sja1000_exit(void)
 {
 	printk(KERN_INFO "%s: driver removed\n", DRV_NAME);
 }
 
-module_exit(sja1000_exit);
+module_exit(adv_sja1000_exit);
